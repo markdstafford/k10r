@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-routes
+  namespace: www
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod     # Add
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.org/client-max-body-size: 50m
+spec:
+  tls:                                                      # Add
+  - hosts:                                                  # Add
+    - ermapta.org                                           # Add
+    - www.ermapta.org                                             # Add
+    - www-stage.ermapta.org                                      # Add
+    secretName: www-ermapta-org-cert                        # Add
+  rules:
+  - host: ermapta.org
+    http:
+      paths:
+      - backend:
+          serviceName: www-wordpress
+          servicePort: 80
+        path: /(.*)
+  - host: www.ermapta.org
+    http:
+      paths:
+      - backend:
+          serviceName: www-wordpress
+          servicePort: 80
+        path: /(.*)
+  - host: www-stage.ermapta.org
+    http:
+      paths:
+      - backend:
+          serviceName: www-stage-wordpress
+          servicePort: 80
+        path: /(.*)
